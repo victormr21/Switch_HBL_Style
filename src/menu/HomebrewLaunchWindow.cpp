@@ -32,11 +32,10 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiIm
     , buttonImgData(Resources::GetImageData("button.png"))
     , iconImage(iconImgData)
     , titleText((char*)NULL, 42, glm::vec4(1.0f))
-    , versionText("Version:", 32, glm::vec4(1.0f))
-    , versionValueText((char*)NULL, 32, glm::vec4(1.0f))
+    , versionText("Version:", 20, glm::vec4(1.0f))
+    , versionValueText((char*)NULL, 20, glm::vec4(1.0f))
     , authorText("Author:", 20, glm::vec4(1.0f))
-    , authorValueText((char*)NULL, 32, glm::vec4(1.0f))
-    , descriptionText((char*)NULL, 28, glm::vec4(1.0f))
+    , authorValueText((char*)NULL, 20, glm::vec4(1.0f))
     , loadBtnLabel("Load", 24, glm::vec4(1.0f))
     , loadImg(buttonImgData)
     , loadBtn(loadImg.getWidth(), loadImg.getHeight())
@@ -46,6 +45,8 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiIm
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , homebrewLaunchPath(launchPath)
+    , buttonATrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_A, true)
+    , buttonBTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_B, true)
 {
     width = backgroundImg.getWidth();
     height = backgroundImg.getHeight();
@@ -59,7 +60,6 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiIm
     HomebrewXML metaXml;
     bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
 
-    int xOffset = 500;
     int yOffset = height * 0.5f - 75.0f;
 
     const char *cpName = xmlReadSuccess ? metaXml.GetName() : launchPath.c_str();
@@ -68,59 +68,50 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiIm
 
     titleText.setText(cpName);
     titleText.setColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-	titleText.setAlignment(ALIGN_CENTER | ALIGN_TOP);
-    titleText.setPosition(0, 147);
-    titleText.setMaxWidth(width - 100, GuiText::DOTTED);
+	titleText.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+    titleText.setPosition(-70, 200);
     append(&titleText);
 
     float scaleFactor = 1.0f;
     iconImage.setAlignment(ALIGN_LEFT | ALIGN_TOP);
-    iconImage.setPosition(117, 101);
-    iconImage.setScale(scaleFactor);
+    iconImage.setPosition(120, -100);
+    iconImage.setSize(256, 256);
     append(&iconImage);
 
     yOffset -= 50;
 
-    versionText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    versionText.setPosition(width - xOffset, yOffset);
+    versionText.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+	versionText.setColor(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+    versionText.setPosition(-118, 130);
     append(&versionText);
 
     versionValueText.setTextf("%s", xmlReadSuccess ? metaXml.GetVersion() : launchPath.c_str());
-    versionValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    versionValueText.setPosition(width - xOffset + 100, yOffset);
-    versionValueText.setMaxWidth(xOffset - 150, GuiText::DOTTED);
+    versionValueText.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+	versionValueText.setColor(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+    versionValueText.setPosition(-50, 130);
     append(&versionValueText);
     yOffset -= 30;
 
-    authorText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+    authorText.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
 	authorText.setColor(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
-    authorText.setPosition(width - xOffset, yOffset);
+    authorText.setPosition(-120, 157);
     append(&authorText);
 
     authorValueText.setTextf("%s", metaXml.GetCoder());
-	authorValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    authorValueText.setPosition(width - xOffset + 100, yOffset);
-    authorValueText.setMaxWidth(xOffset - 150, GuiText::DOTTED);
+	authorValueText.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+	authorValueText.setColor(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+    authorValueText.setPosition(-30, 157);
     append(&authorValueText);
     yOffset -= 50;
-
-    descriptionText.setText(metaXml.GetLongDescription());
-    descriptionText.setAlignment(ALIGN_LEFT | ALIGN_TOP);
-    descriptionText.setPosition(100, -250);
-    descriptionText.setMaxWidth(width - 200, GuiText::WRAP);
-    append(&descriptionText);
 
     scaleFactor = 1.0f;
     loadImg.setScale(scaleFactor);
     loadBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * loadImg.getHeight());
-    loadBtn.setImage(&loadImg);
-    loadBtn.setLabel(&loadBtnLabel);
     loadBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    loadBtn.setPosition(-200, -310);
+    loadBtn.setPosition(547, -355);
+	loadBtn.setTrigger(&buttonATrigger);
     loadBtn.setTrigger(&touchTrigger);
     loadBtn.setTrigger(&wpadTouchTrigger);
-    loadBtn.setEffectGrow();
-    loadBtn.setSoundClick(buttonClickSound);
     loadBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
     append(&loadBtn);
 
@@ -130,6 +121,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiIm
     backBtn.setLabel(&backBtnLabel);
     backBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
     backBtn.setPosition(200, -310);
+	backBtn.setTrigger(&buttonBTrigger);
 	backBtn.setTrigger(&touchTrigger);
 	backBtn.setTrigger(&wpadTouchTrigger);
     backBtn.setEffectGrow();

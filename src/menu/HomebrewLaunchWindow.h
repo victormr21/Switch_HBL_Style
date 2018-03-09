@@ -51,7 +51,6 @@ private:
     GuiText versionValueText;
     GuiText authorText;
     GuiText authorValueText;
-    GuiText descriptionText;
 	
 	GuiText loadBtnLabel;
     GuiImage loadImg;
@@ -61,7 +60,9 @@ private:
     GuiImage backImg;
     GuiButton backBtn;
 	
-    GuiTrigger touchTrigger;
+    GuiTrigger buttonATrigger;
+	GuiTrigger buttonBTrigger;
+	GuiTrigger touchTrigger;
 	GuiTrigger wpadTouchTrigger;
 
     const std::string homebrewLaunchPath;

@@ -26,7 +26,7 @@
 
 #define DEFAULT_WIILOAD_PORT        4299
 
-#define MAX_BUTTONS_ON_PAGE     1
+#define MAX_BUTTONS_ON_PAGE     2
 
 HomebrewWindow::HomebrewWindow(int w, int h)
     : GuiFrame(w, h)
@@ -41,8 +41,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     , hblVersionText("v2.0.0", 20, glm::vec4(1.0f))
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
-    , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_LEFT, true)
-    , buttonRTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_R | GuiTrigger::BUTTON_RIGHT, true)
+    , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_ZL, true)
+    , buttonRTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_R | GuiTrigger::BUTTON_ZR, true)
     , tcpReceiver(DEFAULT_WIILOAD_PORT)
 	, launchaText("Launch", 24, glm::vec4(1.0f))
 {
@@ -73,6 +73,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons[idx].execPath = dirList.GetFilepath(i);
         homebrewButtons[idx].image = new GuiImage(homebrewButtonImgData);
         homebrewButtons[idx].image->setScale(1.0f);
+		homebrewButtons[idx].image->setPosition(-544, -437);
         homebrewButtons[idx].iconImgData = NULL;
 
         std::string homebrewPath = homebrewButtons[idx].execPath;
@@ -92,11 +93,9 @@ HomebrewWindow::HomebrewWindow(int w, int h)
             iconData = NULL;
         }
 
-        const float cfImageScale = 1.0f;
-
         homebrewButtons[idx].iconImg = new GuiImage(homebrewButtons[idx].iconImgData);
-        homebrewButtons[idx].iconImg->setPosition(-450, -500);
-        homebrewButtons[idx].iconImg->setScale(cfImageScale);
+        homebrewButtons[idx].iconImg->setPosition(-544, -437);
+        homebrewButtons[idx].iconImg->setSize(141, 141);
 
         HomebrewXML metaXml;
 
@@ -123,8 +122,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons[idx].button = new GuiButton(homebrewButtonImgData->getWidth(), homebrewButtonImgData->getHeight());
 
         homebrewButtons[idx].button->setImage(homebrewButtons[idx].image);
-        homebrewButtons[idx].button->setPosition(-450, -500);
         homebrewButtons[idx].button->setIcon(homebrewButtons[idx].iconImg);
+        homebrewButtons[idx].button->setPosition(-544, -437);
         homebrewButtons[idx].button->setTrigger(&touchTrigger);
         homebrewButtons[idx].button->setTrigger(&wpadTouchTrigger);
         homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
@@ -338,7 +337,7 @@ void HomebrewWindow::process()
 {
     OSCalendarTime cal_time;
 	OSTicksToCalendarTime(OSGetTime(), &cal_time);
-	time.setTextf("%02i:%02i", cal_time.hour, cal_time.min,);
+	time.setTextf("%02i:%02i:%02i", cal_time.hour, cal_time.min, cal_time.sec);
     time.setColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
     time.setAlignment(ALIGN_TOP | ALIGN_RIGHT);
     time.setPosition(-40, -64);
